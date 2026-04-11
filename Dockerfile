@@ -23,7 +23,7 @@
 # docker-compose.yml から受け取る値の『初期値』を宣言します。
 # こうすることで「単体で docker build する時」でも安全に動きます。
 # ================================================================
-ARG PHP_VERSION=8.5
+ARG PHP_VERSION=8.4
 
 
 # ================================================================
@@ -95,7 +95,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && locale-gen ja_JP.UTF-8 \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-        pdo \
         pdo_mysql \
         mysqli \
         mbstring \
