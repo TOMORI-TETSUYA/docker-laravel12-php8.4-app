@@ -237,9 +237,9 @@ services:
       DB_CONNECTION: mysql
       DB_HOST:       db
       DB_PORT:       3306
-      DB_DATABASE:   ${DB_DATABASE:-laravel}
-      DB_USERNAME:   ${DB_USERNAME:-root}
-      DB_PASSWORD:   ${DB_PASSWORD:-root}
+      DB_DATABASE:   ${DB_DATABASE:-taskflow}
+      DB_USERNAME:   ${DB_USERNAME:-taskflow_user}
+      DB_PASSWORD:   ${DB_PASSWORD:-taskflow_pass}
 
       # ---- entrypoint.sh に渡す「Laravel 本体のフォルダ名」 ----
       # 例: laravel_app / backend / api / src
@@ -302,12 +302,12 @@ services:
     environment:
       # 管理者(root)のパスワード
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
-      # 最初に作られるデータベース名
-      MYSQL_DATABASE:      ${DB_DATABASE:-laravel}
+      # 最初に作られるデータベース名 (web 側の DB_DATABASE と一致必須)
+      MYSQL_DATABASE:      ${DB_DATABASE:-taskflow}
       # 専用ユーザー (root ではなく普段はこっちを使う)
-      MYSQL_USER:          ${DB_USERNAME:-laravel_user}
+      MYSQL_USER:          ${DB_USERNAME:-taskflow_user}
       # 専用ユーザーのパスワード
-      MYSQL_PASSWORD:      ${DB_PASSWORD:-laravel_pass}
+      MYSQL_PASSWORD:      ${DB_PASSWORD:-taskflow_pass}
       # タイムゾーン (日本時間に揃えておく)
       TZ:                  ${TZ:-Asia/Tokyo}
 
