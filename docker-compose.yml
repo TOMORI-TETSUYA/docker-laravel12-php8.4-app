@@ -34,9 +34,11 @@
 #   restart   : コンテナが落ちた時の自動再起動ルール
 # ================================================================
 
-# Docker Compose ファイル形式のバージョン (Compose V2 では省略可)
-# 古い docker-compose v1 との互換性のために書いておく
-version: '3.9'
+# ================================================================
+# ★ Compose V2 ではファイル形式の `version:` 指定は不要 ★
+#   以前は `version: '3.9'` と書いていましたが、現在の
+#   docker compose は無視する上に警告を出すので削除しました。
+# ================================================================
 
 
 # ================================================================
@@ -67,7 +69,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        PHP_VERSION:  ${PHP_VERSION:-8.5}
+        PHP_VERSION:  ${PHP_VERSION:-8.4}
         PUBLIC_DIR:   ${PUBLIC_DIR:-task-manager}
         TZ:           ${TZ:-Asia/Tokyo}
         UPLOAD_MAX:   ${PHP_UPLOAD_MAX:-64M}
