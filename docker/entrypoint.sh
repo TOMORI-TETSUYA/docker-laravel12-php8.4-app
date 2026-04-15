@@ -60,8 +60,13 @@ fi
 # composer.json に書かれたライブラリを vendor/ にダウンロードします。
 # Laravel 12 本体もこれで入手されます。
 # ================================================================
-if [ ! -d "$LARAVEL_PATH/vendor" ]; then
-    echo "[1/4] vendor/ が見つかりません。composer install を実行します..."
+if [ ! -f "$LARAVEL_PATH/vendor/autoload.php" ]; then
+    if [ -d "$LARAVEL_PATH/vendor" ]; then
+        echo "[1/4] vendor/ はありますが autoload.php が欠落しています。"
+        echo "      composer install が途中で失敗した状態とみなし、再インストールします..."
+    else
+        echo "[1/4] vendor/ が見つかりません。composer install を実行します..."
+    fi
     echo "      (初回は数分かかります☕)"
 
     cd "$LARAVEL_PATH"
@@ -76,7 +81,7 @@ if [ ! -d "$LARAVEL_PATH/vendor" ]; then
 
     echo "[1/4] ✓ composer install 完了"
 else
-    echo "[1/4] ✓ vendor/ 確認済み (スキップ)"
+    echo "[1/4] ✓ vendor/autoload.php 確認済み (スキップ)"
 fi
 
 
@@ -158,7 +163,18 @@ EOF
 
     echo "[2/4] ✓ .env 作成完了 (APP_KEY 自動生成済み)"
 else
-    echo "[2/4] ✓ .env 確認済み (スキップ)"
+    # .env は存在するが APP_KEY が空なら生成する
+    # (手動で .env をコピーしただけのケースをリカバリ)
+    if grep -qE '^APP_KEY=\s*$' "$LARAVEL_PATH/.env"; then
+        echo "[2/4] .env は存在しますが APP_KEY が空です。生成します..."
+        cd "$LARAVEL_PATH"
+        php artisan key:generate --force 2>/dev/null || {
+            echo "    ⚠️  key:generate に失敗しました"
+        }
+        echo "[2/4] ✓ APP_KEY 生成完了"
+    else
+        echo "[2/4] ✓ .env 確認済み (スキップ)"
+    fi
 fi
 
 
