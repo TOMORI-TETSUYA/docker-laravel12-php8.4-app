@@ -37,12 +37,14 @@ FROM php:${PHP_VERSION}-apache
 
 # FROM より後で使う ARG はもう一度宣言が必要 (Docker の仕様)
 ARG PUBLIC_DIR=task-manager
+ARG LARAVEL_DIR=laravel_app
 ARG TZ=Asia/Tokyo
 ARG UPLOAD_MAX=64M
 ARG MEMORY_LIMIT=512M
 
 # ENV にも保存して、コンテナ内の実行時にも参照できるようにする
 ENV PUBLIC_DIR=${PUBLIC_DIR}
+ENV LARAVEL_DIR=${LARAVEL_DIR}
 ENV APP_TZ=${TZ}
 
 
@@ -162,7 +164,8 @@ RUN sed -i "s|__UPLOAD_MAX__|${UPLOAD_MAX}|g"   /usr/local/etc/php/conf.d/zz-cus
 # ================================================================
 COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
-RUN sed -i "s|__PUBLIC_DIR__|${PUBLIC_DIR}|g" /etc/apache2/sites-available/000-default.conf
+RUN sed -i "s|__PUBLIC_DIR__|${PUBLIC_DIR}|g"   /etc/apache2/sites-available/000-default.conf \
+ && sed -i "s|__LARAVEL_DIR__|${LARAVEL_DIR}|g"  /etc/apache2/sites-available/000-default.conf
 
 
 # ================================================================
