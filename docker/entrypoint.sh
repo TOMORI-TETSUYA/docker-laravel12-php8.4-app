@@ -99,7 +99,7 @@ if [ ! -f "$LARAVEL_PATH/.env" ]; then
     else
         # .env.example が無い場合は最小限の .env を自作
         cat > "$LARAVEL_PATH/.env" <<'EOF'
-APP_NAME=Laravel
+APP_NAME=T-TaskFlow
 APP_ENV=local
 APP_KEY=
 APP_DEBUG=true
