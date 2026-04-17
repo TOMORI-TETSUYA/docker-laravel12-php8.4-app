@@ -37,14 +37,12 @@ FROM php:${PHP_VERSION}-apache
 
 # FROM より後で使う ARG はもう一度宣言が必要 (Docker の仕様)
 ARG PUBLIC_DIR=task-manager
-ARG LARAVEL_DIR=laravel_app
 ARG TZ=Asia/Tokyo
 ARG UPLOAD_MAX=64M
 ARG MEMORY_LIMIT=512M
 
 # ENV にも保存して、コンテナ内の実行時にも参照できるようにする
 ENV PUBLIC_DIR=${PUBLIC_DIR}
-ENV LARAVEL_DIR=${LARAVEL_DIR}
 ENV APP_TZ=${TZ}
 
 
@@ -126,6 +124,34 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 
 # ================================================================
+# ④-2 Node.js + npm (JavaScript のパッケージ管理人) をインストール
+# ----------------------------------------------------------------
+# ★ 何のため? ★
+#   Vite (ヴィート) というフロントエンドビルドツールを動かすため。
+#   Vite は JS / CSS を 1 個にまとめて圧縮し、ページ読み込みを速くする。
+#
+# ★ たとえ話 ★
+#   Composer = PHP の道具箱管理人
+#   npm      = JavaScript の道具箱管理人
+#   Node.js  = JavaScript を PC 上で動かすエンジン (ブラウザの外で動かす)
+#
+# ★ なぜ Node.js を Docker に入れるの? ★
+#   開発者それぞれの PC に Node.js を入れなくても、
+#   Docker コンテナの中で統一環境で動かせるようにするため。
+#
+# ★ 使い方 (コンテナ内で) ★
+#   cd /var/www/html/laravel_app
+#   npm install         # 初回: package.json の依存関係をダウンロード
+#   npm run build       # 本番用にビルド (task-manager/build/ に出力)
+#   npm run dev         # 開発サーバー起動 (保存で自動リロード)
+# ================================================================
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# ================================================================
 # ⑤ 言語環境を日本語に設定
 # ----------------------------------------------------------------
 # これをしないとエラーメッセージや日付表記が英語になります。
@@ -164,8 +190,7 @@ RUN sed -i "s|__UPLOAD_MAX__|${UPLOAD_MAX}|g"   /usr/local/etc/php/conf.d/zz-cus
 # ================================================================
 COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
-RUN sed -i "s|__PUBLIC_DIR__|${PUBLIC_DIR}|g"   /etc/apache2/sites-available/000-default.conf \
- && sed -i "s|__LARAVEL_DIR__|${LARAVEL_DIR}|g"  /etc/apache2/sites-available/000-default.conf
+RUN sed -i "s|__PUBLIC_DIR__|${PUBLIC_DIR}|g" /etc/apache2/sites-available/000-default.conf
 
 
 # ================================================================
